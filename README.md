@@ -1,7 +1,9 @@
 # pyqt-grid-item-manager
 PyQt widget that can display a grid of items(QGraphicsItem)
 
-Which can be useful to make the graphics software & editor 
+Which can be useful to make the graphics software & editor
+
+pretty much useless currently
 
 ## How to use
 
