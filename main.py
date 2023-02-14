@@ -2,9 +2,9 @@ import math
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsRectItem, \
     QGraphicsScene, QGraphicsView, QWidget, QGraphicsEllipseItem, \
-    QGraphicsPolygonItem, QGraphicsItem, QHBoxLayout, QTableWidget, QVBoxLayout
+    QGraphicsPolygonItem, QGraphicsItem, QHBoxLayout, QTableWidget, QVBoxLayout, QAbstractItemView
 from PyQt5.QtGui import QPolygonF
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import Qt, QPointF, QDataStream, QIODevice
 
 
 class ShapeIcon(QGraphicsView):
@@ -14,6 +14,21 @@ class ShapeIcon(QGraphicsView):
         self.setAlignment(Qt.AlignCenter)
         self.scene().addItem(graphics_item)
         self.setStyleSheet('QGraphicsView { border: 0 }')
+
+
+class ShapeTable(QTableWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__initUi()
+
+    def __initUi(self):
+        self.setRowCount(3)
+        self.setColumnCount(3)
+        self.horizontalHeader().setVisible(False)
+        self.verticalHeader().setVisible(False)
+
+        # Set the drag policy for the table widget
+        self.setDragDropMode(QAbstractItemView.DragDrop)
 
 
 class ShapeMenu(QWidget):
@@ -43,11 +58,7 @@ class ShapeMenu(QWidget):
         self.__parallelogram = QGraphicsPolygonItem(QPolygonF(points))
 
     def __initUi(self):
-        tableWidget = QTableWidget()
-        tableWidget.setRowCount(3)
-        tableWidget.setColumnCount(3)
-        tableWidget.horizontalHeader().setVisible(False)
-        tableWidget.verticalHeader().setVisible(False)
+        tableWidget = ShapeTable()
 
         shape_lst = [self.__rect,
                     self.__ellipse,
@@ -69,7 +80,6 @@ class ShapeMenu(QWidget):
             cellWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             cellWidget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             tableWidget.setCellWidget(i // 3, i % 3, cellWidget)
-
 
         lay = QVBoxLayout()
         lay.addWidget(tableWidget)
