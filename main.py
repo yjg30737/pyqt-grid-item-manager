@@ -1,7 +1,8 @@
+import math
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsRectItem, \
-    QGraphicsScene, QGraphicsView, QWidget, QGridLayout, QGraphicsEllipseItem, \
-    QGraphicsPolygonItem, QGraphicsItem
+    QGraphicsScene, QGraphicsView, QWidget, QGraphicsEllipseItem, \
+    QGraphicsPolygonItem, QGraphicsItem, QHBoxLayout, QTableWidget, QVBoxLayout
 from PyQt5.QtGui import QPolygonF
 from PyQt5.QtCore import Qt, QPointF
 
@@ -42,21 +43,37 @@ class ShapeMenu(QWidget):
         self.__parallelogram = QGraphicsPolygonItem(QPolygonF(points))
 
     def __initUi(self):
-        lay = QGridLayout()
-        lay.setSpacing(0)
+        tableWidget = QTableWidget()
+        tableWidget.setRowCount(3)
+        tableWidget.setColumnCount(3)
+        tableWidget.horizontalHeader().setVisible(False)
+        tableWidget.verticalHeader().setVisible(False)
 
         shape_lst = [self.__rect,
                     self.__ellipse,
                     self.__rhombus,
                     self.__parallelogram]
 
+        max_width = math.ceil(max([shape.boundingRect().width() for shape in shape_lst]))
+        max_height = math.ceil(max([shape.boundingRect().height() for shape in shape_lst]))
+
+        for i in range(tableWidget.rowCount()):
+            tableWidget.setRowHeight(i, max_height + max_height//6)
+
+        for i in range(tableWidget.columnCount()):
+            tableWidget.setColumnWidth(i, max_width + max_width//6)
+
         for i in range(len(shape_lst)):
             curShape = shape_lst[i]
             cellWidget = ShapeIcon(curShape)
-            lay.addWidget(cellWidget, i // 3, i % 3)
+            cellWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            cellWidget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            tableWidget.setCellWidget(i // 3, i % 3, cellWidget)
 
+
+        lay = QVBoxLayout()
+        lay.addWidget(tableWidget)
         self.setLayout(lay)
-
 
 class Window(QMainWindow):
     def __init__(self):
@@ -64,8 +81,14 @@ class Window(QMainWindow):
         self.__initUi()
 
     def __initUi(self):
-        mainWidget = ShapeMenu()
-        mainWidget.setFixedSize(mainWidget.sizeHint())
+        sidebar = ShapeMenu()
+        sidebar.setFixedSize(sidebar.sizeHint())
+        view = QGraphicsView()
+        lay = QHBoxLayout()
+        lay.addWidget(sidebar)
+        lay.addWidget(view)
+        mainWidget = QWidget()
+        mainWidget.setLayout(lay)
         self.setCentralWidget(mainWidget)
 
 
